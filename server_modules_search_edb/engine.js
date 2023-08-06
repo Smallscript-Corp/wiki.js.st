@@ -20,17 +20,17 @@ module.exports = {
       console.log(`Edges-EDB: DbQuery CREATE pages_ft`);
       const pages_ft_create = await knex.raw(`
         CREATE VIRTUAL TABLE IF NOT EXISTS pages_ft
-        USING fts5(id UNINDEXED, path, title, description, safe_content, tags, localeCode UNINDEXED)`);
+        USING fts5(id UNINDEXED, path, title, description, pgcontent, tags, localeCode UNINDEXED)`);
       const insert_into_pages_ft = await knex.raw(`
-        INSERT INTO pages_ft (id, path, title, description, safe_content, tags, localeCode)
+        INSERT INTO pages_ft (id, path, title, description, pgcontent, tags, localeCode)
         SELECT id, path, title, description, content, '', 'en' from pages`);
     }
     const insert_pages_ft = await knex.raw(`
       CREATE TRIGGER IF NOT EXISTS insert_pages_ft
         AFTER INSERT ON pages
       BEGIN
-        INSERT INTO pages_ft (id, path, title, description, safe_content, tags, localeCode)
-        VALUES (NEW.id, NEW.path, NEW.title, NEW.description, NEW.safe_content, '', 'en');
+        INSERT INTO pages_ft (id, path, title, description, pgcontent, tags, localeCode)
+        VALUES (NEW.id, NEW.path, NEW.title, NEW.description, NEW.content, '', 'en');
       END`);
     const update_pages_ft = await knex.raw(`
       CREATE TRIGGER IF NOT EXISTS update_pages_ft
@@ -41,7 +41,7 @@ module.exports = {
           path = NEW.path,
           title = NEW.title,
           description = NEW.description,
-          safe_content = NEW.content,
+          pgcontent = NEW.content,
           tags = '',
           localeCode = 'en'
         WHERE id == NEW.id;
