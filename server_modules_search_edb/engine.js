@@ -112,7 +112,7 @@ module.exports = {
   },
   pgRrecFromPage(page) {
     const knex = WIKI.models.knex;
-    const {id, path, title, description, pgcontent: safe_content, localeCode, tags} = page;
+    const {id, path, title, description, safe_content: pgcontent, localeCode, tags} = page;
     const pg_rec = {id, path, title, description, pgcontent, localeCode, tags};
     return pg_rec;
   },
