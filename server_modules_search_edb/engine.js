@@ -25,28 +25,28 @@ module.exports = {
         INSERT INTO pages_ft (id, path, title, description, safe_content, tags, localeCode)
         SELECT id, path, title, description, content, '', 'en' from pages`);
     }
-    const insert_pages_ft = await knex.raw(`  
+    const insert_pages_ft = await knex.raw(`
       CREATE TRIGGER IF NOT EXISTS insert_pages_ft
         AFTER INSERT ON pages
       BEGIN
         INSERT INTO pages_ft (id, path, title, description, safe_content, tags, localeCode)
         VALUES (NEW.id, NEW.path, NEW.title, NEW.description, NEW.safe_content, '', 'en');
       END`);
-    const update_pages_ft = await knex.raw(`  
+    const update_pages_ft = await knex.raw(`
       CREATE TRIGGER IF NOT EXISTS update_pages_ft
         AFTER UPDATE ON pages
       BEGIN
         UPDATE pages_ft
         SET
           path = NEW.path,
-          title = NEW.title, 
-          description = NEW.description, 
+          title = NEW.title,
+          description = NEW.description,
           safe_content = NEW.content,
           tags = '',
           localeCode = 'en'
         WHERE id == NEW.id;
       END;`);
-    const delete_pages_ft = await knex.raw(`  
+    const delete_pages_ft = await knex.raw(`
       CREATE TRIGGER IF NOT EXISTS delete_pages_ft
         AFTER DELETE ON pages
       BEGIN
