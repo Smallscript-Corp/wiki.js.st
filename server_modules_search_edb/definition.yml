@@ -1,0 +1,8 @@
+key: EDB
+title: Database - EdgeS EDB Contribution
+description: Basic SqLite FTS5 search engine.
+author: smallscript@users.noreply.github.com
+logo: https://static.requarks.io/logo/database.svg
+website: https://github.com/smallscript
+isAvailable: true
+props: {}
