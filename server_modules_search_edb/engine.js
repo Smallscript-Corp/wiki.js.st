@@ -112,8 +112,8 @@ module.exports = {
   },
   pgRrecFromPage(page) {
     const knex = WIKI.models.knex;
-    const {id, path, title, description, safeContent, localeCode, tags} = page;
-    const pg_rec = {id, path, title, description, safeContent, localeCode, tags};
+    const {id, path, title, description, pgcontent: safe_content, localeCode, tags} = page;
+    const pg_rec = {id, path, title, description, pgcontent, localeCode, tags};
     return pg_rec;
   },
   /**
@@ -154,7 +154,11 @@ module.exports = {
   async rebuild() {
     const knex = WIKI.models.knex;
     console.log(`Edges-EDB: DbQuery rebuild`);
-    const pages_ft_drop = await knex.raw(`DROP TABLE IF EXISTS pages_ft`);
+    const pages_ft_drop = await knex.raw(`
+      DROP TRIGGER IF EXISTS insert_pages_ft;
+      DROP TRIGGER IF EXISTS update_pages_ft;
+      DROP TRIGGER IF EXISTS delete_pages_ft;
+      DROP TABLE IF EXISTS pages_ft;`);
     await module.exports.init.call(this);
   }
 }
