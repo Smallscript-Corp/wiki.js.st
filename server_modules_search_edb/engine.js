@@ -51,7 +51,7 @@ module.exports = {
         AFTER DELETE ON pages
       BEGIN
         DELETE FROM pages_ft
-        WHERE id == NEW.id;
+        WHERE id == OLD.id;
       END`);
   },
   /**
@@ -165,11 +165,10 @@ module.exports = {
   async rebuild() {
     const knex = WIKI.models.knex;
     console.log(`Edges-EDB: DbQuery rebuild`);
-    const pages_ft_drop = await knex.raw(`
-      DROP TRIGGER IF EXISTS insert_pages_ft;
-      DROP TRIGGER IF EXISTS update_pages_ft;
-      DROP TRIGGER IF EXISTS delete_pages_ft;
-      DROP TABLE IF EXISTS pages_ft;`);
+    await knex.raw(`DROP TRIGGER IF EXISTS insert_pages_ft`);
+    await knex.raw(`DROP TRIGGER IF EXISTS update_pages_ft`);
+    await knex.raw(`DROP TRIGGER IF EXISTS delete_pages_ft`);
+    await knex.raw(`DROP TABLE IF EXISTS pages_ft`);
     await module.exports.init.call(this);
   }
 }
