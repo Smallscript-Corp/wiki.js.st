@@ -65,12 +65,23 @@ module.exports = {
     if(true) {
       //🔰 We could use ‹q› or ‹opts›
       //｢😈 beware of escaping issues w/inline knex-query vs direct sql-param passing｣
-      results = await knex.raw(`
-      SELECT title, description, path, '' as tags, id, 'en' as locale
-        FROM pages_ft
-        WHERE pages_ft MATCH '${q}'
-        ORDER BY bm25(pages_ft,10,5,2)
-        LIMIT ${WIKI.config.search.maxHits}`);
+      try {
+        results = await knex.raw(`
+          SELECT
+            title,
+            COALESCE(
+              (CASE WHEN description = '' THEN NULL ELSE description END),
+              snippet(pages_ft, -1, '⟨', '🐾⟩','꘏',8)
+            ) AS description,
+            path, '' as tags, id, 'en' as locale
+          FROM pages_ft
+          WHERE pages_ft MATCH "${q.replaceAll('"', '""')}"
+          ORDER BY bm25(pages_ft,10,5,2)
+          LIMIT ${WIKI.config.search.maxHits}`);
+      } catch(err) {
+        results = undefined;
+        console.log(`EdgeS-edb: query-fault`, err);
+      }
     }
     else {
       results = await WIKI.models.pages.query()
